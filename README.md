@@ -90,4 +90,4 @@ Sorun bildirimi ve önerileriniz için:
 
 ## Lisans
 
-Bu yazılım telif hakkı ile korunmaktadır. © 2024 Tüm hakları saklıdır. 
+Bu yazılım telif hakkı ile korunmaktadır. © 2024 Tüm hakları saklıdır.
