@@ -1,0 +1,20 @@
+Source: tamir-atolyesi
+Section: utils
+Priority: optional
+Maintainer: Mehmet Said Özsoy <mehmetsaidozsoy@gmail.com>
+Build-Depends: debhelper (>= 9), python3, python3-setuptools, python3-pip
+
+Package: tamir-atolyesi
+Architecture: all
+Depends: python3, python3-tk, ${misc:Depends}, ${python3:Depends}
+Description: Tamir Atölyesi Yönetim Sistemi
+ Bu program, tamir atölyelerinin müşteri ve tamir kayıtlarını
+ yönetmek için tasarlanmış bir masaüstü uygulamasıdır.
+ .
+ Özellikler:
+  * Müşteri yönetimi
+  * Tamir kaydı yönetimi
+  * Maliyet tahmini
+  * PDF ve Excel raporlama
+  * E-posta yedekleme
+  * Kullanıcı girişi 

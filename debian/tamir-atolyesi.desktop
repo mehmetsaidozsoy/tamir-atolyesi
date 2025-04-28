@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Tamir Atölyesi
+Comment=Tamir Atölyesi Yönetim Sistemi
+Exec=tamir_atolyesi
+Icon=/usr/share/tamir-atolyesi/icon.png
+Terminal=false
+Type=Application
+Categories=Office;
+Keywords=tamir;atölye;yönetim; 

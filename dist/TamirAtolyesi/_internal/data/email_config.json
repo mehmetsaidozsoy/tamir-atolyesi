@@ -1,0 +1,8 @@
+{
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 465,
+    "sender_email": "mehmetsaidozsoy@gmail.com",
+    "sender_password": "edwl kghr wppx vfsq\n",
+    "receiver_email": "mehmetsaidozsoy@gmail.com",
+    "backup_time": "23:00"
+}
