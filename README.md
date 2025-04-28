@@ -84,9 +84,8 @@ En son sürümü işletim sisteminize göre aşağıdaki bağlantılardan indire
 ## Destek
 
 Sorun bildirimi ve önerileriniz için:
-- E-posta: mehmetsaidozsoy@gmail.com
-- Telefon: 0541 781 33 68
-- GitHub: https://github.com/mehmetsaidozsoy/tamir-atolyesi/issues
+- GitHub üzerinden "Issues" bölümünü kullanabilirsiniz: https://github.com/mehmetsaidozsoy/tamir-atolyesi/issues
+- Veya GitHub profilimden benimle iletişime geçebilirsiniz.
 
 ## Lisans
 
