@@ -1,0 +1,118 @@
+# .cursorrules - Python projesi için kapsamlı kurallar
+
+[core]
+# Kodun otomatik olarak biçimlendirilmesi için black kullan
+formatter = black
+
+# Otomatik import sıralaması için isort kullan
+import_sorter = isort
+
+# Linter olarak ruff kullan
+linter = ruff
+
+# Test komutları
+test_command = pytest
+
+# Dökümantasyon oluşturucu
+doc_generator = pdoc
+
+# Python sürümü
+python_version = 3.10
+
+[formatting]
+# Maksimum satır uzunluğu
+line_length = 88
+
+# Stringlerde çift tırnak kullan
+quote_style = double
+
+# Fonksiyonlar ve sınıflar arasında 2 satır boşluk bırak
+blank_lines_between_top_level_defs = 2
+
+# Son satırda boş satır bulunsun
+insert_final_newline = true
+
+[linting]
+# Hataları ve uyarıları göster
+show_warnings = true
+show_errors = true
+
+# Aşağıdaki klasörleri ve dosyaları lint etme
+exclude = 
+    __pycache__/
+    .venv/
+    build/
+    dist/
+    .vscode/
+    .cursor/
+    *.pyc
+    *.pyo
+    *.pyd
+    tamir_atolyesi.db
+    *.spec
+
+# Aşağıdaki kuralları devre dışı bırak (örnekler)
+disable_rules = 
+    E501  # line too long (zaten formatter ile çözülüyor)
+    E203  # whitespace before ':'
+    W503  # line break before binary operator
+
+[testing]
+# Test dosyası desenleri
+test_file_patterns = 
+    test_*.py
+    *_test.py
+
+# Testler çalıştırılırken aşağıdaki klasörleri hariç tut
+test_exclude = 
+    .venv/
+    build/
+    dist/
+    .vscode/
+    .cursor/
+
+[docs]
+# Dökümantasyon dosyası uzantıları
+doc_file_extensions = 
+    .md
+    .rst
+
+# Dökümantasyon oluşturulurken hariç tutulacak klasörler
+doc_exclude = 
+    .venv/
+    build/
+    dist/
+    .vscode/
+    .cursor/
+
+[files]
+# Otomatik olarak izlenecek dosya uzantıları
+watch_extensions = 
+    .py
+    .md
+    .rst
+
+# Otomatik olarak izlenmeyecek dosya ve klasörler
+watch_exclude = 
+    __pycache__/
+    .venv/
+    build/
+    dist/
+    .vscode/
+    .cursor/
+    *.pyc
+    *.pyo
+    *.pyd
+    tamir_atolyesi.db
+    *.spec
+
+[misc]
+# Kodda TODO, FIXME gibi notları vurgula
+highlight_tags = 
+    TODO
+    FIXME
+    BUG
+    HACK
+
+# Kodda otomatik olarak güncellenecek başlıklar
+auto_update_headers = true

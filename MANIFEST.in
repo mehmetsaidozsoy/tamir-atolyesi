@@ -1,0 +1,31 @@
+include LICENSE
+include README.md
+include requirements.txt
+include icon.ico
+include DejaVuSans.ttf
+include tamir_atolyesi.db
+include config.py
+include utils.py
+include backup_manager.py
+include models.py
+include database.py
+include main.py
+include gui.py
+include i18n.py
+
+recursive-include tamir_atolyesi/icons *.png *.ico
+recursive-include tamir_atolyesi/data *.db
+recursive-include tamir_atolyesi/locale *.mo
+recursive-include tamir_atolyesi/fonts *.ttf
+recursive-include tamir_atolyesi/gui *.py
+recursive-include tamir_atolyesi/web-ui *
+recursive-include tamir_atolyesi/models *.py
+recursive-include tamir_atolyesi/database *.py
+recursive-include tamir_atolyesi/utils *.py
+recursive-include tamir_atolyesi/backup *.py
+recursive-include tamir_atolyesi/config *.py
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .git* 

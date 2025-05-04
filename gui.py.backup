@@ -32,19 +32,7 @@ logger = logging.getLogger(__name__)
 class TamirAtolyesiGUI:
     def __init__(self, root):
         self.root = root
-        self.root.withdraw()  # Ana pencereyi başlangıçta gizle
-        
-        # Giriş başarılı olana kadar ana pencereyi gösterme
-        if not self.kullanici_girisi():
-            self.root.quit()
-            return
-            
-        self.root.deiconify()  # Ana pencereyi göster
         self.root.title("Tamir Atölyesi Yönetim Sistemi")
-        self.root.state('zoomed')  # Tam ekran yap
-        
-        # Pencereyi ekranın ortasına konumlandır
-        self.center_window()
         
         logger.info("TamirAtolyesiGUI başlatılıyor...")
         
@@ -196,8 +184,6 @@ class TamirAtolyesiGUI:
             login.title("Giriş")
             login.geometry("300x150")
             login.resizable(False, False)
-            login.transient(self.root)  # Ana pencereye bağlı modal pencere
-            login.grab_set()  # Pencereyi modal yap
             
             # Pencereyi ortala
             login.update_idletasks()
@@ -211,43 +197,58 @@ class TamirAtolyesiGUI:
             frame = ttk.Frame(login, padding="20")
             frame.pack(fill="both", expand=True)
             
-            # Kullanıcı adı ve şifre alanları
-            ttk.Label(frame, text="Kullanıcı Adı:").grid(row=0, column=0, sticky="w")
+            # Kullanıcı adı
+            ttk.Label(frame, text="Kullanıcı Adı:").grid(row=0, column=0, sticky="w", pady=5)
             username = ttk.Entry(frame)
-            username.grid(row=0, column=1, padx=5, pady=5)
-            username.focus()
+            username.grid(row=0, column=1, sticky="ew", pady=5)
             
-            ttk.Label(frame, text="Şifre:").grid(row=1, column=0, sticky="w")
+            # Şifre
+            ttk.Label(frame, text="Şifre:").grid(row=1, column=0, sticky="w", pady=5)
             password = ttk.Entry(frame, show="*")
-            password.grid(row=1, column=1, padx=5, pady=5)
+            password.grid(row=1, column=1, sticky="ew", pady=5)
             
-            # Giriş sonucu
-            self.login_success = False
+            # Sonuç
+            result = {"success": False, "username": None}
             
             def do_login():
-                # Burada gerçek kullanıcı doğrulama yapılacak
                 if username.get() == "admin" and password.get() == "1234":
-                    self.login_success = True
-                    login.destroy()
+                    result["success"] = True
+                    result["username"] = username.get()
+                    login.quit()
                 else:
                     messagebox.showerror("Hata", "Geçersiz kullanıcı adı veya şifre!")
-                    
+                    password.delete(0, "end")
+                    password.focus()
+            
             # Giriş butonu
-            login_btn = ttk.Button(frame, text="Giriş", command=do_login)
-            login_btn.grid(row=2, column=0, columnspan=2, pady=10)
+            ttk.Button(frame, text="Giriş", command=do_login).grid(row=2, column=0, columnspan=2, pady=20)
             
             # Enter tuşu ile giriş
-            login.bind('<Return>', lambda e: do_login())
+            login.bind("<Return>", lambda e: do_login())
             
-            # Pencereyi modal yap
-            login.focus_force()
-            self.root.wait_window(login)
+            # İlk alana odaklan
+            username.focus()
             
-            return self.login_success
+            # Pencereyi göster ve döngüyü başlat
+            login.mainloop()
+            
+            # Sonucu döndür
+            success = result["success"]
+            username = result["username"]
+            
+            # Pencereleri temizle
+            login.destroy()
+            
+            if success:
+                logger.info(f"Kullanıcı girişi başarılı: {username}")
+                self.current_user = username
+                return True
+            
+            logger.warning("Kullanıcı girişi başarısız veya iptal edildi")
+            return False
             
         except Exception as e:
-            logger.error(f"Giriş hatası: {str(e)}")
-            messagebox.showerror("Hata", "Giriş işlemi sırasında bir hata oluştu!")
+            logger.error(f"Kullanıcı girişi hatası: {str(e)}")
             return False
     
     def on_closing(self):
@@ -1439,15 +1440,6 @@ class TamirAtolyesiGUI:
                 logger.error(f"E-posta ayarları güncellenirken hata: {str(e)}")
                 self.show_notification("Hata", "E-posta ayarları güncellenemedi", "error")
 
-    def center_window(self):
-        """Pencereyi ekranın ortasına konumlandırır"""
-        self.root.update_idletasks()
-        width = self.root.winfo_width()
-        height = self.root.winfo_height()
-        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.root.winfo_screenheight() // 2) - (height // 2)
-        self.root.geometry(f'+{x}+{y}')
-    
 class MusteriDialog:
     def __init__(self, parent, title, musteri=None):
         self.dialog = tk.Toplevel(parent)
@@ -1680,235 +1672,205 @@ class RaporDialog(tk.Toplevel):
         super().__init__(parent)
         self.db = db
         self.title("Rapor Oluştur")
-        self.geometry("600x500")
+        self.geometry("500x400")
         self.resizable(False, False)
         
-        # Ana frame
-        main_frame = ttk.Frame(self, padding="10")
-        main_frame.pack(fill="both", expand=True)
+        # Grid yapılandırması
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         
         # Rapor türü seçimi
-        ttk.Label(main_frame, text="Rapor Türü:", font=("Arial", 10, "bold")).pack(anchor="w", pady=(0, 5))
-        self.rapor_turu = ttk.Combobox(main_frame, values=[
+        ttk.Label(self, text="Rapor Türü:", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.rapor_turu = ttk.Combobox(self, values=[
             "Tamir Raporu - Tüm Kayıtlar",
             "Tamir Raporu - Tamamlanan İşler",
             "Tamir Raporu - Devam Eden İşler",
             "Müşteri Bazlı Tamir Raporu",
             "Maliyet Analiz Raporu"
-        ], state="readonly", width=40)
+        ], state="readonly", width=30)
         self.rapor_turu.set("Tamir Raporu - Tüm Kayıtlar")
-        self.rapor_turu.pack(fill="x", pady=(0, 10))
+        self.rapor_turu.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         
-        # Tarih seçimi frame
-        date_frame = ttk.LabelFrame(main_frame, text="Tarih Aralığı", padding="10")
-        date_frame.pack(fill="x", pady=(0, 10))
+        # Tarih seçimi
+        ttk.Label(self, text="Başlangıç Tarihi:", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.baslangic_tarihi = DateEntry(self, date_pattern="yyyy-mm-dd", locale="tr_TR")
+        self.baslangic_tarihi.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         
-        # Başlangıç tarihi
-        ttk.Label(date_frame, text="Başlangıç:").grid(row=0, column=0, padx=5, pady=5)
-        self.baslangic_tarihi = DateEntry(
-            date_frame,
-            width=20,
-            background='darkblue',
-            foreground='white',
-            borderwidth=2,
-            date_pattern='yyyy-mm-dd',
-            locale='tr_TR'
-        )
-        self.baslangic_tarihi.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(self, text="Bitiş Tarihi:", font=("Arial", 10, "bold")).grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.bitis_tarihi = DateEntry(self, date_pattern="yyyy-mm-dd", locale="tr_TR")
+        self.bitis_tarihi.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         
-        # Bitiş tarihi
-        ttk.Label(date_frame, text="Bitiş:").grid(row=1, column=0, padx=5, pady=5)
-        self.bitis_tarihi = DateEntry(
-            date_frame,
-            width=20,
-            background='darkblue',
-            foreground='white',
-            borderwidth=2,
-            date_pattern='yyyy-mm-dd',
-            locale='tr_TR'
-        )
-        self.bitis_tarihi.grid(row=1, column=1, padx=5, pady=5)
-        
-        # Rapor formatı
-        format_frame = ttk.LabelFrame(main_frame, text="Rapor Formatı", padding="10")
-        format_frame.pack(fill="x", pady=(0, 10))
-        
-        self.rapor_format = tk.StringVar(value="pdf")
-        ttk.Radiobutton(format_frame, text="PDF", variable=self.rapor_format, value="pdf").pack(side="left", padx=20)
-        ttk.Radiobutton(format_frame, text="Excel", variable=self.rapor_format, value="excel").pack(side="left", padx=20)
+        # Rapor formatı seçimi
+        ttk.Label(self, text="Rapor Formatı:", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        self.rapor_format = ttk.Combobox(self, values=["PDF", "Excel"], state="readonly")
+        self.rapor_format.set("PDF")
+        self.rapor_format.grid(row=3, column=1, padx=5, pady=5, sticky="w")
         
         # Butonlar
-        button_frame = ttk.Frame(main_frame)
-        button_frame.pack(fill="x", pady=(10, 0))
+        button_frame = ttk.Frame(self)
+        button_frame.grid(row=4, column=0, columnspan=2, pady=20)
         
-        ttk.Button(button_frame, text="Rapor Oluştur", command=self.rapor_olustur, width=20).pack(side="left", padx=5)
-        ttk.Button(button_frame, text="İptal", command=self.destroy, width=20).pack(side="left", padx=5)
+        ttk.Button(button_frame, text="Rapor Oluştur", command=self.rapor_olustur).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="İptal", command=self.destroy).pack(side=tk.LEFT, padx=5)
     
     def rapor_olustur(self):
+        baslangic = self.baslangic_tarihi.get()
+        bitis = self.bitis_tarihi.get()
+        format = self.rapor_format.get()
+        rapor_turu = self.rapor_turu.get()
+        
+        if not baslangic or not bitis:
+            messagebox.showerror("Hata", "Lütfen tarih aralığını belirtin")
+            return
+        
         try:
-            # Tarih formatını kontrol et
-            try:
-                baslangic = self.baslangic_tarihi.get_date().strftime("%Y-%m-%d")
-                bitis = self.bitis_tarihi.get_date().strftime("%Y-%m-%d")
-            except Exception as e:
-                messagebox.showerror("Hata", "Geçersiz tarih formatı!")
+            baslangic_date = datetime.strptime(baslangic, "%Y-%m-%d")
+            bitis_date = datetime.strptime(bitis, "%Y-%m-%d")
+            if bitis_date < baslangic_date:
+                messagebox.showerror("Hata", "Bitiş tarihi başlangıç tarihinden önce olamaz")
                 return
-            
-            # Rapor türünü belirle
-            rapor_turu = self.rapor_turu.get()
-            durum = None
-            if "Tamamlanan İşler" in rapor_turu:
-                durum = "Tamamlandı"
-            elif "Devam Eden İşler" in rapor_turu:
-                durum = "Devam Ediyor"
-            
-            # Rapor verilerini al
-            if "Müşteri Bazlı" in rapor_turu:
-                veriler = self.db.musteri_bazli_tamir_raporu(baslangic, bitis)
-            elif "Maliyet Analiz" in rapor_turu:
-                veriler = self.db.maliyet_analiz_raporu(baslangic, bitis)
-            else:
-                veriler = self.db.musteri_tamir_raporu(baslangic, bitis, durum)
-            
-            if not veriler:
-                messagebox.showwarning("Uyarı", "Seçilen tarih aralığında veri bulunamadı!")
-                return
-            
-            # Rapor oluştur
-            if self.rapor_format.get() == "pdf":
-                self.pdf_raporu_olustur(veriler, rapor_turu, baslangic, bitis)
-            else:
-                self.excel_raporu_olustur(veriler, rapor_turu, baslangic, bitis)
-            
-        except Exception as e:
-            messagebox.showerror("Hata", f"Rapor oluşturulurken bir hata oluştu:\n{str(e)}")
-    
-    def pdf_raporu_olustur(self, veriler, rapor_turu, baslangic, bitis):
+        except ValueError:
+            messagebox.showerror("Hata", "Geçersiz tarih formatı")
+            return
+        
         try:
-            # Rapor dosyası oluştur
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            dosya_adi = f"{rapor_turu.lower().replace(' ', '_')}_{timestamp}.pdf"
-            dosya_yolu = REPORT_DIR / dosya_adi
-            
-            # PDF oluştur
-            pdf = FPDF()
-            pdf.add_font('DejaVu', '', 'DejaVuSans.ttf', uni=True)
-            pdf.set_font('DejaVu', '', 12)
-            
-            # Başlık sayfası
-            pdf.add_page()
-            pdf.set_font('DejaVu', '', 16)
-            pdf.cell(0, 10, rapor_turu, ln=True, align="C")
-            pdf.set_font('DejaVu', '', 12)
-            pdf.cell(0, 10, f"Tarih Aralığı: {baslangic} - {bitis}", ln=True)
-            pdf.cell(0, 10, f"Oluşturulma Tarihi: {datetime.now().strftime('%d.%m.%Y %H:%M')}", ln=True)
-            
-            # Rapor içeriği
-            pdf.add_page()
-            if "Müşteri Bazlı" in rapor_turu:
-                self._musteri_bazli_pdf_rapor(pdf, veriler)
-            elif "Maliyet Analiz" in rapor_turu:
-                self._maliyet_analiz_pdf_rapor(pdf, veriler)
+            if format == "PDF":
+                self.pdf_raporu_olustur(baslangic, bitis, rapor_turu)
             else:
-                self._tamir_pdf_rapor(pdf, veriler)
-            
-            # PDF'i kaydet
-            pdf.output(str(dosya_yolu))
-            
-            # Raporu aç
-            os.startfile(dosya_yolu)
-            messagebox.showinfo("Başarılı", f"Rapor oluşturuldu:\n{dosya_yolu}")
-            
+                self.excel_raporu_olustur(baslangic, bitis, rapor_turu)
+            messagebox.showinfo("Başarılı", "Rapor başarıyla oluşturuldu")
+            self.destroy()
         except Exception as e:
-            raise Exception(f"PDF raporu oluşturulurken hata: {str(e)}")
+            messagebox.showerror("Hata", f"Rapor oluşturulurken bir hata oluştu: {str(e)}")
     
-    def excel_raporu_olustur(self, veriler, rapor_turu, baslangic, bitis):
+    def pdf_raporu_olustur(self, baslangic, bitis, rapor_turu):
+        belgeler_klasoru = str(Path.home() / "Documents")
+        zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
+        dosya_adi = f"{rapor_turu.lower().replace(' ', '_')}_{zaman_damgasi}.pdf"
+        dosya_yolu = os.path.join(belgeler_klasoru, dosya_adi)
+        
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font('DejaVu', '', 'DejaVuSans.ttf', uni=True)
+        
+        # Başlık
+        pdf.set_font('DejaVu', '', 16)
+        pdf.cell(0, 10, rapor_turu, ln=True, align="C")
+        
+        # Rapor bilgileri
+        pdf.set_font('DejaVu', '', 12)
+        pdf.cell(0, 10, f"Tarih Aralığı: {baslangic} - {bitis}", ln=True)
+        pdf.cell(0, 10, f"Rapor Tarihi: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}", ln=True)
+        pdf.ln(10)
+        
+        # Rapor içeriği
+        if "Tamamlanan İşler" in rapor_turu:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis, durum="Tamamlandı")
+        elif "Devam Eden İşler" in rapor_turu:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis, durum="Devam Ediyor")
+        elif "Müşteri Bazlı" in rapor_turu:
+            musteri_tamirler = self.db.musteri_bazli_tamir_raporu(baslangic, bitis)
+        elif "Maliyet Analiz" in rapor_turu:
+            musteri_tamirler = self.db.maliyet_analiz_raporu(baslangic, bitis)
+        else:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis)
+        
+        if not musteri_tamirler:
+            pdf.cell(0, 10, "Bu tarih aralığında kayıt bulunamadı.", ln=True)
+        else:
+            toplam_maliyet = 0
+            for row in musteri_tamirler:
+                musteri = Musteri(id=row[0], ad=row[1], soyad=row[2], telefon=row[3], email=row[4], adres=row[5])
+                tamir = Tamir(id=row[6], musteri_id=row[7], cihaz=row[8], sorun=row[9], tarih=row[10], maliyet=row[11], durum=row[12])
+                
+                pdf.set_font('DejaVu', '', 12)
+                pdf.cell(0, 10, f"Müşteri: {musteri.ad} {musteri.soyad}", ln=True)
+                pdf.set_font('DejaVu', '', 10)
+                pdf.cell(0, 10, f"Telefon: {musteri.telefon}", ln=True)
+                pdf.cell(0, 10, f"Cihaz: {tamir.cihaz}", ln=True)
+                pdf.cell(0, 10, f"Sorun: {tamir.sorun}", ln=True)
+                pdf.cell(0, 10, f"Tamir Tarihi: {tamir.tarih}", ln=True)
+                pdf.cell(0, 10, f"Durum: {tamir.durum}", ln=True)
+                pdf.cell(0, 10, f"Maliyet: {tamir.maliyet:.2f} TL", ln=True)
+                pdf.ln(5)
+                
+                if tamir.maliyet:
+                    toplam_maliyet += tamir.maliyet
+            
+            # Toplam maliyet
+            pdf.ln(5)
+            pdf.set_font('DejaVu', '', 12)
+            pdf.cell(0, 10, f"Toplam Maliyet: {toplam_maliyet:.2f} TL", ln=True)
+        
         try:
-            # Rapor dosyası oluştur
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            dosya_adi = f"{rapor_turu.lower().replace(' ', '_')}_{timestamp}.xlsx"
-            dosya_yolu = REPORT_DIR / dosya_adi
-            
-            # Excel verilerini hazırla
-            if "Müşteri Bazlı" in rapor_turu:
-                df = pd.DataFrame(veriler, columns=[
-                    'Müşteri ID', 'Ad', 'Soyad', 'Telefon', 'E-posta', 'Adres',
-                    'Tamir Sayısı', 'Toplam İşçilik', 'Toplam Parça', 'Genel Toplam'
-                ])
-            elif "Maliyet Analiz" in rapor_turu:
-                df = pd.DataFrame(veriler, columns=[
-                    'Tamir ID', 'Müşteri Adı', 'Cihaz', 'Sorun', 'Giriş Tarihi',
-                    'İşçilik Ücreti', 'Parça Ücreti', 'Toplam Ücret', 'Kullanılan Parçalar'
-                ])
-            else:
-                df = pd.DataFrame(veriler, columns=[
-                    'Tamir ID', 'Müşteri Adı', 'Cihaz', 'Sorun', 'Giriş Tarihi',
-                    'Durum', 'İşçilik Ücreti', 'Parça Ücreti', 'Toplam Ücret'
-                ])
-            
-            # Excel'e kaydet
-            df.to_excel(dosya_yolu, index=False, sheet_name=rapor_turu[:31])
-            
-            # Raporu aç
-            os.startfile(dosya_yolu)
-            messagebox.showinfo("Başarılı", f"Rapor oluşturuldu:\n{dosya_yolu}")
-            
+            pdf.output(dosya_yolu)
+            messagebox.showinfo("Başarılı", f"Rapor başarıyla oluşturuldu:\n{dosya_yolu}")
         except Exception as e:
-            raise Exception(f"Excel raporu oluşturulurken hata: {str(e)}")
+            print(f"PDF raporu oluşturma hatası: {e}")
+            messagebox.showerror("Hata", "PDF raporu oluşturulurken bir hata oluştu.")
     
-    def _musteri_bazli_pdf_rapor(self, pdf, veriler):
-        # Tablo başlıkları
-        headers = ['Müşteri', 'Tamir Sayısı', 'Toplam İşçilik', 'Toplam Parça', 'Genel Toplam']
-        col_widths = [60, 30, 30, 30, 30]
+    def excel_raporu_olustur(self, baslangic, bitis, rapor_turu):
+        belgeler_klasoru = str(Path.home() / "Documents")
+        zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
+        dosya_adi = f"{rapor_turu.lower().replace(' ', '_')}_{zaman_damgasi}.xlsx"
+        dosya_yolu = os.path.join(belgeler_klasoru, dosya_adi)
         
-        for i, header in enumerate(headers):
-            pdf.cell(col_widths[i], 10, header, 1)
-        pdf.ln()
+        # Rapor verilerini al
+        if "Tamamlanan İşler" in rapor_turu:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis, durum="Tamamlandı")
+        elif "Devam Eden İşler" in rapor_turu:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis, durum="Devam Ediyor")
+        elif "Müşteri Bazlı" in rapor_turu:
+            musteri_tamirler = self.db.musteri_bazli_tamir_raporu(baslangic, bitis)
+        elif "Maliyet Analiz" in rapor_turu:
+            musteri_tamirler = self.db.maliyet_analiz_raporu(baslangic, bitis)
+        else:
+            musteri_tamirler = self.db.musteri_tamir_raporu(baslangic, bitis)
         
-        # Tablo içeriği
-        for veri in veriler:
-            pdf.cell(60, 10, f"{veri[1]} {veri[2]}", 1)
-            pdf.cell(30, 10, str(veri[6]), 1)
-            pdf.cell(30, 10, f"{veri[7]:.2f} TL", 1)
-            pdf.cell(30, 10, f"{veri[8]:.2f} TL", 1)
-            pdf.cell(30, 10, f"{veri[9]:.2f} TL", 1)
-            pdf.ln()
-    
-    def _maliyet_analiz_pdf_rapor(self, pdf, veriler):
-        # Tablo başlıkları
-        headers = ['Müşteri', 'Cihaz', 'İşçilik', 'Parça', 'Toplam']
-        col_widths = [50, 50, 30, 30, 30]
+        data = []
+        toplam_maliyet = 0
+        for row in musteri_tamirler:
+            musteri = Musteri(id=row[0], ad=row[1], soyad=row[2], telefon=row[3], email=row[4], adres=row[5])
+            tamir = Tamir(id=row[6], musteri_id=row[7], cihaz=row[8], sorun=row[9], tarih=row[10], maliyet=row[11], durum=row[12])
+            
+            data.append({
+                "Müşteri Adı": f"{musteri.ad} {musteri.soyad}",
+                "Telefon": musteri.telefon,
+                "Cihaz": tamir.cihaz,
+                "Sorun": tamir.sorun,
+                "Tamir Tarihi": tamir.tarih,
+                "Durum": tamir.durum,
+                "Maliyet (TL)": tamir.maliyet if tamir.maliyet else 0
+            })
+            
+            if tamir.maliyet:
+                toplam_maliyet += tamir.maliyet
         
-        for i, header in enumerate(headers):
-            pdf.cell(col_widths[i], 10, header, 1)
-        pdf.ln()
-        
-        # Tablo içeriği
-        for veri in veriler:
-            pdf.cell(50, 10, veri[1], 1)
-            pdf.cell(50, 10, veri[2], 1)
-            pdf.cell(30, 10, f"{veri[3]:.2f} TL", 1)
-            pdf.cell(30, 10, f"{veri[4]:.2f} TL", 1)
-            pdf.cell(30, 10, f"{veri[5]:.2f} TL", 1)
-            pdf.ln()
-    
-    def _tamir_pdf_rapor(self, pdf, veriler):
-        # Tablo başlıkları
-        headers = ['Tarih', 'Müşteri', 'Cihaz', 'Durum', 'Toplam']
-        col_widths = [30, 50, 50, 30, 30]
-        
-        for i, header in enumerate(headers):
-            pdf.cell(col_widths[i], 10, header, 1)
-        pdf.ln()
-        
-        # Tablo içeriği
-        for veri in veriler:
-            pdf.cell(30, 10, veri[2].split()[0], 1)
-            pdf.cell(50, 10, f"{veri[3]} {veri[4]}", 1)
-            pdf.cell(50, 10, veri[5], 1)
-            pdf.cell(30, 10, veri[6], 1)
-            pdf.cell(30, 10, f"{veri[7]:.2f} TL", 1)
-            pdf.ln()
+        try:
+            with pd.ExcelWriter(dosya_yolu, engine='openpyxl') as writer:
+                # Rapor bilgileri sayfası
+                rapor_bilgileri = pd.DataFrame({
+                    'Rapor Bilgileri': [
+                        rapor_turu,
+                        f'Tarih Aralığı: {baslangic} - {bitis}',
+                        f'Rapor Tarihi: {datetime.now().strftime("%d.%m.%Y %H:%M:%S")}',
+                        f'Toplam Kayıt: {len(data)}',
+                        f'Toplam Maliyet: {toplam_maliyet:.2f} TL'
+                    ]
+                })
+                rapor_bilgileri.to_excel(writer, index=False, sheet_name='Rapor Bilgileri')
+                
+                # Detay sayfası
+                if data:
+                    df = pd.DataFrame(data)
+                    df.to_excel(writer, index=False, sheet_name='Detaylar')
+                else:
+                    pd.DataFrame({'Bilgi': ['Bu tarih aralığında kayıt bulunamadı.']}).to_excel(writer, index=False, sheet_name='Detaylar')
+            
+            messagebox.showinfo("Başarılı", f"Rapor başarıyla oluşturuldu:\n{dosya_yolu}")
+        except Exception as e:
+            print(f"Excel raporu oluşturma hatası: {e}")
+            messagebox.showerror("Hata", "Excel raporu oluşturulurken bir hata oluştu.")
 
 class EmailAyarlariDialog:
     def __init__(self, parent):
