@@ -7,10 +7,10 @@ Bu program, tamir atölyelerinin müşteri ve tamir kayıtlarını yönetmek iç
 En son sürümü işletim sisteminize göre aşağıdaki bağlantılardan indirebilirsiniz:
 
 ### Windows
-- [TamirAtolyesi-1.0.0-windows.zip](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.0.0/tamir-atolyesi-1.0.0-windows.zip)
+- [TamirAtolyesi-1.1.0-windows.zip](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.1.0/tamir-atolyesi-1.1.0-windows.zip)
 
 ### Linux
-- [tamir-atolyesi-1.0.0-linux.tar.gz](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.0.0/tamir-atolyesi-1.0.0-linux.tar.gz)
+- [tamir-atolyesi-1.1.0-linux.tar.gz](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.1.0/tamir-atolyesi-1.1.0-linux.tar.gz)
 
 ## Özellikler
 
@@ -24,19 +24,19 @@ En son sürümü işletim sisteminize göre aşağıdaki bağlantılardan indire
 ## Kurulum
 
 ### Windows
-1. `TamirAtolyesi-1.0.0-windows.zip` dosyasını indirin
+1. `TamirAtolyesi-1.1.0-windows.zip` dosyasını indirin
 2. ZIP dosyasını açın
 3. `setup.exe` dosyasını çalıştırın
 4. Kurulum sihirbazını takip edin
 5. Program otomatik olarak başlayacaktır
 
 ### Linux (Ubuntu/Lubuntu)
-1. `tamir-atolyesi-1.0.0-linux.tar.gz` dosyasını indirin
+1. `tamir-atolyesi-1.1.0-linux.tar.gz` dosyasını indirin
 2. Terminal'i açın ve indirilen dosyanın bulunduğu dizine gidin
 3. Arşivi açın:
    ```bash
-   tar xzf tamir-atolyesi-1.0.0-linux.tar.gz
-   cd tamir-atolyesi-1.0.0-linux
+   tar xzf tamir-atolyesi-1.1.0-linux.tar.gz
+   cd tamir-atolyesi-1.1.0-linux
    ```
 4. Kurulum scriptini çalıştırın:
    ```bash
