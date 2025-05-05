@@ -9,6 +9,12 @@ class TamirAtolyesiApp(tk.Tk):
         super().__init__()
         
         self.db = VeritabaniYonetici()
+        # Admin kullanıcısının yetki seviyesini otomatik olarak 0'a çek
+        try:
+            self.db.cursor.execute("UPDATE kullanicilar SET yetki_seviyesi=0 WHERE kullanici_adi='admin'")
+            self.db.conn.commit()
+        except Exception as e:
+            print("Admin yetki güncelleme hatası:", e)
         self.title("Tamir Atölyesi")
         
         # Ana container
@@ -39,6 +45,7 @@ class TamirAtolyesiApp(tk.Tk):
         tk.Label(login_frame, text="Kullanıcı Adı:", bg='#f0f0f0', font=('Arial', 10)).pack(pady=5)
         self.username = tk.Entry(login_frame, font=('Arial', 10))
         self.username.pack(pady=5, fill='x')
+        self.username.insert(0, 'admin')
         
         tk.Label(login_frame, text="Şifre:", bg='#f0f0f0', font=('Arial', 10)).pack(pady=5)
         self.password = tk.Entry(login_frame, show="*", font=('Arial', 10))
@@ -82,12 +89,12 @@ class TamirAtolyesiApp(tk.Tk):
         
         user = self.db.kullanici_dogrula(username, password)
         if user:
-            self.show_main_app()
+            self.show_main_app(username, int(user[1]))
         else:
             messagebox.showerror("Hata", "Geçersiz kullanıcı adı veya şifre!")
             self.password.delete(0, tk.END)
     
-    def show_main_app(self):
+    def show_main_app(self, username, yetki_seviyesi):
         # Mevcut frame'i kaldır
         if self.current_frame:
             self.current_frame.destroy()
@@ -103,7 +110,7 @@ class TamirAtolyesiApp(tk.Tk):
         
         try:
             # Ana uygulamayı başlat
-            TamirAtolyesiGUI(main_frame)
+            TamirAtolyesiGUI(main_frame, current_user=username, current_user_yetki_seviyesi=yetki_seviyesi)
             self.current_frame = main_frame
             
             # Çıkış butonu ekle

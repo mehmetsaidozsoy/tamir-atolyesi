@@ -1284,7 +1284,7 @@ class VeritabaniYonetici:
             self.cursor.execute('''
                 SELECT 
                     t.id,
-                    t.tarih,
+                    t.giris_tarihi,
                     m.ad,
                     m.soyad,
                     t.cihaz_turu || ' ' || t.marka || ' ' || t.model as cihaz,
@@ -1292,7 +1292,7 @@ class VeritabaniYonetici:
                     t.toplam_ucret
                 FROM tamirler t
                 JOIN musteriler m ON t.musteri_id = m.id
-                ORDER BY t.tarih DESC
+                ORDER BY t.giris_tarihi DESC
             ''')
             return self.cursor.fetchall()
         except sqlite3.Error as e:
@@ -1302,4 +1302,24 @@ class VeritabaniYonetici:
     @hata_yonetimi
     def tamir_tamamla(self, tamir_id):
         """Belirtilen tamir kaydını tamamlandı olarak işaretler"""
-        return self.tamir_durum_guncelle(tamir_id, "Tamamlandı") 
+        return self.tamir_durum_guncelle(tamir_id, "Tamamlandı")
+
+    def giris_tarihi_alani_ekle(self):
+        """tamirler tablosuna giris_tarihi alanı ekler (varsa hata vermez)"""
+        try:
+            self.cursor.execute("ALTER TABLE tamirler ADD COLUMN giris_tarihi DATETIME DEFAULT (datetime('now','localtime'));")
+            self.conn.commit()
+        except Exception as e:
+            if 'duplicate column name' in str(e) or 'already exists' in str(e):
+                pass  # Zaten ekli ise hata verme
+            else:
+                raise
+
+    def test_tamirlerini_sil(self):
+        """Test verisi olarak eklenen tamir ve müşterileri siler (ad TestAd ile başlayanlar)"""
+        try:
+            self.cursor.execute("DELETE FROM tamirler WHERE musteri_id IN (SELECT id FROM musteriler WHERE ad LIKE 'TestAd%')")
+            self.cursor.execute("DELETE FROM musteriler WHERE ad LIKE 'TestAd%'")
+            self.conn.commit()
+        except Exception as e:
+            raise 

@@ -28,6 +28,7 @@ class LoginForm(tk.Toplevel):
         ttk.Label(self, text="Kullanıcı Adı:").pack(pady=5)
         self.username_entry = ttk.Entry(self)
         self.username_entry.pack(pady=5)
+        self.username_entry.insert(0, "admin")
         
         ttk.Label(self, text="Şifre:").pack(pady=5)
         self.password_entry = ttk.Entry(self, show="*")
