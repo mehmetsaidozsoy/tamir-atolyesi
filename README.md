@@ -7,10 +7,10 @@ Bu program, tamir atölyelerinin müşteri ve tamir kayıtlarını yönetmek iç
 En son sürümü işletim sisteminize göre aşağıdaki bağlantılardan indirebilirsiniz:
 
 ### Windows
-- [TamirAtolyesi-1.1.0-windows.zip](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.1.0/tamir-atolyesi-1.1.0-windows.zip)
+- [tamir-atolyesi-1.1.0-windows.zip](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/untagged-d3b606ebb7937929bc60/tamir-atolyesi-1.0.1-windows.zip))
 
 ### Linux
-- [tamir-atolyesi-1.1.0-linux.tar.gz](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/v1.1.0/tamir-atolyesi-1.1.0-linux.tar.gz)
+- [tamir-atolyesi-1.1.0-linux.tar.gz](https://github.com/mehmetsaidozsoy/tamir-atolyesi/releases/download/untagged-d3b606ebb7937929bc60/tamir-atolyesi-1.0.1-linux.tar.gz )
 
 ## Özellikler
 
@@ -89,4 +89,4 @@ Sorun bildirimi ve önerileriniz için:
 
 ## Lisans
 
-Bu yazılım telif hakkı ile korunmaktadır. © 2024 Tüm hakları saklıdır.
+Bu yazılım telif hakkı ile korunmaktadır. © 2025 Tüm hakları saklıdır.
