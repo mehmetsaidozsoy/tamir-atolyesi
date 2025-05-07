@@ -9,10 +9,10 @@ mv dist/TamirAtolyesi "dist/${PROGRAM}-${VERSION}-windows"
 # Linux için release klasörü oluştur
 mkdir -p "dist/${PROGRAM}-${VERSION}-linux"
 
-# Gerekli dosyaları Linux klasörüne kopyala
+# Gerekli dosya ve klasörleri Linux klasörüne kopyala
 cp -r \
     main.py \
-    gui.py \
+    gui/ \
     models.py \
     database.py \
     utils.py \
@@ -22,10 +22,18 @@ cp -r \
     README.md \
     DejaVuSans.ttf \
     icon.ico \
-    setup.py \
     install.sh \
-    debian \
+    LICENSE \
     "dist/${PROGRAM}-${VERSION}-linux/"
+
+# Boş backup ve data klasörleri oluştur
+mkdir -p "dist/${PROGRAM}-${VERSION}-linux/backups"
+mkdir -p "dist/${PROGRAM}-${VERSION}-linux/data"
+mkdir -p "dist/${PROGRAM}-${VERSION}-linux/data/backups"
+mkdir -p "dist/${PROGRAM}-${VERSION}-linux/data/logs"
+
+# (İsteğe bağlı) Boş bir veritabanı ekle
+# touch "dist/${PROGRAM}-${VERSION}-linux/tamir_atolyesi.db"
 
 # Linux arşivi oluştur
 cd dist

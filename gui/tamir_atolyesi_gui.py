@@ -724,14 +724,14 @@ class TamirAtolyesiGUI:
         # Ayarları yükle
         self.load_email_settings()
         # Test verisi ekle butonu
-        ttk.Button(self.settings_frame, text="Test Verisi Ekle", command=self.add_test_data).pack(pady=10)
+        # ttk.Button(self.settings_frame, text="Test Verisi Ekle", command=self.add_test_data).pack(pady=10)
         # giris_tarihi alanı ekle butonu
-        ttk.Button(self.settings_frame, text="giris_tarihi Alanı Ekle", command=self.ekle_giris_tarihi_alani).pack(pady=2)
+        # ttk.Button(self.settings_frame, text="giris_tarihi Alanı Ekle", command=self.ekle_giris_tarihi_alani).pack(pady=2)
         # Test verilerini sil butonu
-        ttk.Button(self.settings_frame, text="Test Verilerini Sil", command=self.sil_test_tamirleri).pack(pady=2)
+        # ttk.Button(self.settings_frame, text="Test Verilerini Sil", command=self.sil_test_tamirleri).pack(pady=2)
         # Eksik giris_tarihi doldur butonu
-        ttk.Button(self.settings_frame, text="Eksik giris_tarihi Doldur", command=self.doldur_eksik_giris_tarihi).pack(pady=2)
-        ttk.Button(self.settings_frame, text="Tüm giris_tarihi 3 saat ileri al", command=self.giris_tarihi_ileri_al).pack(pady=2)
+        # ttk.Button(self.settings_frame, text="Eksik giris_tarihi Doldur", command=self.doldur_eksik_giris_tarihi).pack(pady=2)
+        # ttk.Button(self.settings_frame, text="Tüm giris_tarihi 3 saat ileri al", command=self.giris_tarihi_ileri_al).pack(pady=2)
 
     def load_settings(self):
         """Mevcut ayarları yükler"""
@@ -2367,8 +2367,8 @@ class TamirAtolyesiGUI:
                 img = img.resize((64, 64))
                 logo = ImageTk.PhotoImage(img)
                 logo_label = tk.Label(self.about_frame, image=logo)
-                logo_label.image = logo
                 logo_label.pack(pady=(0, 10))
+                setattr(logo_label, "image", logo)
         except Exception:
             pass
         # Açıklama kutusu
@@ -2376,7 +2376,7 @@ class TamirAtolyesiGUI:
         desc_frame.pack(padx=30, pady=10, fill="x", anchor="n")
         desc = ("Bu yazılım, tamir atölyeleri için müşteri ve tamir yönetimini kolaylaştırmak amacıyla geliştirilmiştir.\n"
                 "Kullanıcı dostu arayüzü ve kapsamlı raporlama özellikleriyle işlerinizi kolaylaştırır.\n\n"
-                "© 2024 Tüm hakları saklıdır.\nGeliştirici: ...\nİletişim: ...")
+                "© 2025 Tüm hakları saklıdır.\nGeliştirici: Mehmet Said ÖZSOY\nİletişim: 0 541 781 33 68")
         ttk.Label(desc_frame, text=desc, font=("Arial", 11), justify="left", wraplength=500).pack(anchor="w")
 
     def setup_manual_tab(self):

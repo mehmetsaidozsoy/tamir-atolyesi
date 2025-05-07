@@ -44,7 +44,18 @@ class MusteriYonetimi(tk.Toplevel):
         # Veritabanından müşterileri al
         musteriler = self.db.musteri_listesi()
         for musteri in musteriler:
-            self.musteri_listesi.insert("", tk.END, values=musteri)
+            # Eğer musteri bir dict ise tuple olarak aktar
+            if isinstance(musteri, dict):
+                self.musteri_listesi.insert("", tk.END, values=(
+                    musteri.get("id", ""),
+                    musteri.get("ad", ""),
+                    musteri.get("soyad", ""),
+                    musteri.get("telefon", ""),
+                    musteri.get("email", ""),
+                    musteri.get("adres", "")
+                ))
+            else:
+                self.musteri_listesi.insert("", tk.END, values=musteri)
             
     def yeni_musteri(self):
         dialog = MusteriDialog(self)
@@ -89,25 +100,29 @@ class MusteriDialog(tk.Toplevel):
         self.form_frame = ttk.Frame(self)
         self.form_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        ttk.Label(self.form_frame, text="Ad:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        ttk.Label(self.form_frame, text="TC No:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.tc_entry = ttk.Entry(self.form_frame)
+        self.tc_entry.grid(row=0, column=1, sticky=tk.EW, pady=5)
+        
+        ttk.Label(self.form_frame, text="Ad:").grid(row=1, column=0, sticky=tk.W, pady=5)
         self.ad_entry = ttk.Entry(self.form_frame)
-        self.ad_entry.grid(row=0, column=1, sticky=tk.EW, pady=5)
+        self.ad_entry.grid(row=1, column=1, sticky=tk.EW, pady=5)
         
-        ttk.Label(self.form_frame, text="Soyad:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        ttk.Label(self.form_frame, text="Soyad:").grid(row=2, column=0, sticky=tk.W, pady=5)
         self.soyad_entry = ttk.Entry(self.form_frame)
-        self.soyad_entry.grid(row=1, column=1, sticky=tk.EW, pady=5)
+        self.soyad_entry.grid(row=2, column=1, sticky=tk.EW, pady=5)
         
-        ttk.Label(self.form_frame, text="Telefon:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        ttk.Label(self.form_frame, text="Telefon:").grid(row=3, column=0, sticky=tk.W, pady=5)
         self.telefon_entry = ttk.Entry(self.form_frame)
-        self.telefon_entry.grid(row=2, column=1, sticky=tk.EW, pady=5)
+        self.telefon_entry.grid(row=3, column=1, sticky=tk.EW, pady=5)
         
-        ttk.Label(self.form_frame, text="E-posta:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ttk.Label(self.form_frame, text="E-posta:").grid(row=4, column=0, sticky=tk.W, pady=5)
         self.eposta_entry = ttk.Entry(self.form_frame)
-        self.eposta_entry.grid(row=3, column=1, sticky=tk.EW, pady=5)
+        self.eposta_entry.grid(row=4, column=1, sticky=tk.EW, pady=5)
         
-        ttk.Label(self.form_frame, text="Adres:").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ttk.Label(self.form_frame, text="Adres:").grid(row=5, column=0, sticky=tk.W, pady=5)
         self.adres_text = tk.Text(self.form_frame, height=4)
-        self.adres_text.grid(row=4, column=1, sticky=tk.EW, pady=5)
+        self.adres_text.grid(row=5, column=1, sticky=tk.EW, pady=5)
         
         # Butonlar
         self.button_frame = ttk.Frame(self)
@@ -120,24 +135,43 @@ class MusteriDialog(tk.Toplevel):
             self.form_doldur()
             
     def form_doldur(self):
-        self.ad_entry.insert(0, self.musteri["ad"])
-        self.soyad_entry.insert(0, self.musteri["soyad"])
-        self.telefon_entry.insert(0, self.musteri["telefon"])
-        self.eposta_entry.insert(0, self.musteri["eposta"])
-        self.adres_text.insert("1.0", self.musteri["adres"])
+        if not self.musteri:
+            return
+        self.tc_entry.insert(0, self.musteri.get("tc_no", ""))
+        self.ad_entry.insert(0, self.musteri.get("ad", ""))
+        self.soyad_entry.insert(0, self.musteri.get("soyad", ""))
+        self.telefon_entry.insert(0, self.musteri.get("telefon", ""))
+        self.eposta_entry.insert(0, self.musteri.get("email", ""))
+        self.adres_text.insert("1.0", self.musteri.get("adres", ""))
         
     def kaydet(self):
         veri = {
+            "tc_no": self.tc_entry.get(),
             "ad": self.ad_entry.get(),
             "soyad": self.soyad_entry.get(),
             "telefon": self.telefon_entry.get(),
-            "eposta": self.eposta_entry.get(),
+            "email": self.eposta_entry.get(),
             "adres": self.adres_text.get("1.0", tk.END).strip()
         }
         
         if self.musteri:
-            self.db.musteri_guncelle(self.musteri["id"], veri)
+            self.db.musteri_guncelle(
+                self.musteri["id"],
+                veri["tc_no"],
+                veri["ad"],
+                veri["soyad"],
+                veri["telefon"],
+                veri["email"],
+                veri["adres"]
+            )
         else:
-            self.db.musteri_ekle(veri)
+            self.db.musteri_ekle(
+                veri["tc_no"],
+                veri["ad"],
+                veri["soyad"],
+                veri["telefon"],
+                veri["email"],
+                veri["adres"]
+            )
             
         self.destroy() 
